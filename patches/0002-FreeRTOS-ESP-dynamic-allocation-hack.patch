@@ -1,0 +1,96 @@
+From b1fe9945e67e81098587fbc9852226c5f7acf49b Mon Sep 17 00:00:00 2001
+From: Marek Antoniak <kfazol@gmail.com>
+Date: Sun, 19 Jul 2020 11:46:02 +0200
+Subject: [PATCH] FreeRTOS ESP dynamic allocation hack
+
+---
+ components/freertos/freertos/tasks.c                        | 4 ++--
+ components/freertos/freertos/timers.c                       | 6 +++---
+ .../freertos/port/esp8266/include/freertos/FreeRTOSConfig.h | 5 +++--
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/components/freertos/freertos/tasks.c b/components/freertos/freertos/tasks.c
+index 28d5f406..66cfb083 100644
+--- a/components/freertos/freertos/tasks.c
++++ b/components/freertos/freertos/tasks.c
+@@ -417,7 +417,7 @@ PRIVILEGED_DATA static volatile UBaseType_t uxSchedulerSuspended	= ( UBaseType_t
+ 
+ #endif
+ 
+-#if( configSUPPORT_STATIC_ALLOCATION == 1 )
++#if(( configSUPPORT_STATIC_ALLOCATION == 1 ) && (configESP_HACK != 1))
+ 
+ 	extern void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+ 
+@@ -1928,7 +1928,7 @@ void vTaskStartScheduler( void )
+ BaseType_t xReturn;
+ 
+ 	/* Add the idle task at the lowest priority. */
+-	#if( configSUPPORT_STATIC_ALLOCATION == 1 )
++	#if(( configSUPPORT_STATIC_ALLOCATION == 1 ) && (configESP_HACK != 1))
+ 	{
+ 		StaticTask_t *pxIdleTaskTCBBuffer = NULL;
+ 		StackType_t *pxIdleTaskStackBuffer = NULL;
+diff --git a/components/freertos/freertos/timers.c b/components/freertos/freertos/timers.c
+index 29d8cb9f..5df64fbe 100644
+--- a/components/freertos/freertos/timers.c
++++ b/components/freertos/freertos/timers.c
+@@ -141,7 +141,7 @@ PRIVILEGED_DATA static TaskHandle_t xTimerTaskHandle = NULL;
+ 
+ /*-----------------------------------------------------------*/
+ 
+-#if( configSUPPORT_STATIC_ALLOCATION == 1 )
++#if(( configSUPPORT_STATIC_ALLOCATION == 1 ) && (configESP_HACK != 1))
+ 
+ 	/* If static allocation is supported then the application must provide the
+ 	following callback function - which enables the application to optionally
+@@ -232,7 +232,7 @@ BaseType_t xReturn = pdFAIL;
+ 
+ 	if( xTimerQueue != NULL )
+ 	{
+-		#if( configSUPPORT_STATIC_ALLOCATION == 1 )
++		#if(( configSUPPORT_STATIC_ALLOCATION == 1 ) && (configESP_HACK != 1))
+ 		{
+ 			StaticTask_t *pxTimerTaskTCBBuffer = NULL;
+ 			StackType_t *pxTimerTaskStackBuffer = NULL;
+@@ -905,7 +905,7 @@ static void prvCheckForValidListAndQueue( void )
+ 			pxCurrentTimerList = &xActiveTimerList1;
+ 			pxOverflowTimerList = &xActiveTimerList2;
+ 
+-			#if( configSUPPORT_STATIC_ALLOCATION == 1 )
++			#if(( configSUPPORT_STATIC_ALLOCATION == 1 ) && (configESP_HACK != 1))
+ 			{
+ 				/* The timer queue is allocated statically in case
+ 				configSUPPORT_DYNAMIC_ALLOCATION is 0. */
+diff --git a/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h b/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h
+index 9b38540d..d70fc2fd 100644
+--- a/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h
++++ b/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h
+@@ -43,7 +43,7 @@
+  * application requirements.
+  *
+  * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
+- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE. 
++ * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
+  *
+  * See http://www.freertos.org/a00110.html.
+  *----------------------------------------------------------*/
+@@ -55,7 +55,7 @@
+ #define configUSE_TICK_HOOK			1
+ 
+ #define configUSE_TICKLESS_IDLE 	1
+-#define configCPU_CLOCK_HZ			( ( unsigned long ) 80000000 )	
++#define configCPU_CLOCK_HZ			( ( unsigned long ) 80000000 )
+ #define configTICK_RATE_HZ			( ( portTickType ) CONFIG_FREERTOS_HZ )
+ #define configMAX_PRIORITIES		15
+ #if CONFIG_ESP8266_WIFI_DEBUG_LOG_ENABLE
+@@ -183,5 +183,6 @@ uint32_t esp_get_time(void);
+ #endif /* configIDLE_TASK_STACK_SIZE */
+ 
+ #define configSUPPORT_STATIC_ALLOCATION 1
++#define configESP_HACK 1
+ 
+ #endif /* FREERTOS_CONFIG_H */
+-- 
+2.22.0.windows.1
+

@@ -1,0 +1,7 @@
+import subprocess
+
+subprocess.run([
+    '@Python3_venv_EXECUTABLE@',
+    '@TOOLCHAIN_XTENSA_LX106_ELF@/SDK/tools/terminal.py',
+    '@ESP_PORT0@'
+])

@@ -1,0 +1,39 @@
+From 266f713e15bea8c2323a4223ff0631f01d082079 Mon Sep 17 00:00:00 2001
+From: Marek Antoniak <kfazol@gmail.com>
+Date: Mon, 27 Jul 2020 21:48:11 +0200
+Subject: [PATCH] Fixed build for gcc 9.2.0
+
+---
+ components/newlib/newlib/include/sys/reent.h | 2 +-
+ components/spi_flash/src/partition.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/components/newlib/newlib/include/sys/reent.h b/components/newlib/newlib/include/sys/reent.h
+index bb52ae65..1dbc1e70 100644
+--- a/components/newlib/newlib/include/sys/reent.h
++++ b/components/newlib/newlib/include/sys/reent.h
+@@ -402,7 +402,7 @@ struct _reent
+   char *_asctime_buf;
+ 
+   /* signal info */
+-  void (**(_sig_func))(int);
++  void (**_sig_func)(int);
+ 
+ # ifndef _REENT_GLOBAL_ATEXIT
+   /* atexit stuff */
+diff --git a/components/spi_flash/src/partition.c b/components/spi_flash/src/partition.c
+index f41a7892..38d8fce0 100644
+--- a/components/spi_flash/src/partition.c
++++ b/components/spi_flash/src/partition.c
+@@ -205,7 +205,7 @@ static esp_err_t load_partitions()
+ #endif
+ 
+         // it->label may not be zero-terminated
+-        strncpy(item->info.label, (const char*) it->label, sizeof(it->label));
++        strncpy(item->info.label, (const char*) it->label, sizeof(item->info.label));
+         item->info.label[sizeof(it->label)] = 0;
+         // add it to the list
+         if (last == NULL) {
+-- 
+2.22.0.windows.1
+

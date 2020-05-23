@@ -1,0 +1,24 @@
+From 161091ea5962ff1bd251552f87bb69d36df845f0 Mon Sep 17 00:00:00 2001
+From: Marek Antoniak <kfazol@gmail.com>
+Date: Sat, 23 May 2020 13:07:08 +0200
+Subject: [PATCH] FreeRTOSSettings
+
+---
+ .../freertos/port/esp8266/include/freertos/FreeRTOSConfig.h    | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h b/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h
+index 080ce65c..9b38540d 100644
+--- a/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h
++++ b/components/freertos/port/esp8266/include/freertos/FreeRTOSConfig.h
+@@ -182,5 +182,6 @@ uint32_t esp_get_time(void);
+ #define configIDLE_TASK_STACK_SIZE CONFIG_FREERTOS_IDLE_TASK_STACKSIZE
+ #endif /* configIDLE_TASK_STACK_SIZE */
+ 
+-#endif /* FREERTOS_CONFIG_H */
++#define configSUPPORT_STATIC_ALLOCATION 1
+ 
++#endif /* FREERTOS_CONFIG_H */
+-- 
+2.22.0.windows.1
+
